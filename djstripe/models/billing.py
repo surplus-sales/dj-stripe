@@ -2418,7 +2418,7 @@ class UsageRecord(StripeModel):
         return f"Usage for {self.subscription_item} ({self.action}) is {self.quantity}"
 
     @classmethod
-    def _api_create(cls, api_key=djstripe_settings.STRIPE_SECRET_KEY, **kwargs):
+    def _api_create(cls, subscription_item, *, api_key=djstripe_settings.STRIPE_SECRET_KEY, **kwargs):
         """
         Call the stripe API's create operation for this model.
 
@@ -2436,7 +2436,7 @@ class UsageRecord(StripeModel):
             raise
 
         usage_stripe_data = stripe.SubscriptionItem.create_usage_record(
-            api_key=api_key, **kwargs
+            api_key=api_key,subscription_item=subscription_item, **kwargs
         )
 
         # ! Hack: there is no way to retrieve a UsageRecord object from Stripe,
