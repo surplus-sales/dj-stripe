@@ -517,6 +517,7 @@ class PaymentMethodType(Enum):
     affirm = _("Affirm")
     afterpay_clearpay = _("Afterpay Clearpay")
     alipay = _("Alipay")
+    amazon_pay = _("Amazon Pay")
     au_becs_debit = _("BECS Debit (Australia)")
     bacs_debit = _("Bacs Direct Debit")
     bancontact = _("Bancontact")
