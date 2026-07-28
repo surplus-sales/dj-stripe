@@ -803,7 +803,33 @@ class StripeModel(StripeBaseModel):
             # This is common during webhook handling, since Stripe sends
             # multiple webhook events simultaneously,
             # each of which will cause recursive syncs. See issue #429
-            return cls.stripe_objects.get(id=id_), False
+            try:
+                return cls.stripe_objects.get(id=id_), False
+            except cls.DoesNotExist:
+                # The IntegrityError was NOT a race condition: the object was
+                # never created. This happens when the object was built from
+                # incomplete nested data (e.g. an invoice line item embeds a
+                # partial Price that omits its required `product` FK), so the
+                # insert hit a NOT NULL / FK constraint. Refetch the canonical
+                # object from Stripe (which includes the missing fields) and
+                # create it properly, instead of masking it as a DoesNotExist.
+                if id_ is None:
+                    raise
+                data = cls(id=id_).api_retrieve(
+                    stripe_account=stripe_account, api_key=api_key
+                )
+                with transaction.atomic():
+                    return (
+                        cls._create_from_stripe_object(
+                            data,
+                            current_ids=current_ids,
+                            pending_relations=pending_relations,
+                            save=save,
+                            stripe_account=stripe_account,
+                            api_key=api_key,
+                        ),
+                        True,
+                    )
 
     @classmethod
     def _stripe_object_to_customer(
