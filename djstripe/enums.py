@@ -278,6 +278,7 @@ class BusinessType(Enum):
 
 class CaptureMethod(Enum):
     automatic = _("Automatic")
+    automatic_async = _("Automatic Async")
     manual = _("Manual")
 
 
