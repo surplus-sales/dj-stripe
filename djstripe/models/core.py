@@ -1815,7 +1815,10 @@ class PaymentIntent(StripeModel):
     )
     capture_method = StripeEnumField(
         enum=enums.CaptureMethod,
-        help_text="Capture method of this PaymentIntent, one of automatic or manual.",
+        help_text=(
+            "Capture method of this PaymentIntent, one of automatic, "
+            "automatic_async or manual."
+        ),
     )
     client_secret = models.TextField(
         max_length=5000,
